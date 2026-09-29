@@ -1,19 +1,21 @@
-import platform
+from __future__ import annotations
+
 import asyncio
-from typing import Dict, List, Optional
-from .types import SandboxPolicy, SandboxResult, SandboxBackend
-from .policy import PolicyValidator
-from .mount import MountManager
+import platform
+
+from .jail_container import ContainerJail
+from .jail_linux import LinuxNamespaceJail
 from .jail_subprocess import SubprocessJail
 from .jail_windows import WindowsJobJail
-from .jail_linux import LinuxNamespaceJail
-from .jail_container import ContainerJail
+from .mount import MountManager
+from .policy import PolicyValidator
+from .types import SandboxBackend, SandboxPolicy, SandboxResult
 
 
 class Sandbox:
     """Main facade for the swarmsandbox library."""
     
-    def __init__(self, policy: Optional[SandboxPolicy] = None, backend: SandboxBackend = SandboxBackend.AUTO):
+    def __init__(self, policy: SandboxPolicy | None = None, backend: SandboxBackend = SandboxBackend.AUTO):
         self.policy = policy or PolicyValidator.default_policy()
         
         # Validate policy and print warnings if any
@@ -46,8 +48,8 @@ class Sandbox:
             
         return SubprocessJail(self.policy)
         
-    async def run(self, command: List[str], cwd: Optional[str] = None, 
-                  env: Optional[Dict[str, str]] = None, stdin: Optional[str] = None) -> SandboxResult:
+    async def run(self, command: list[str], cwd: str | None = None, 
+                  env: dict[str, str] | None = None, stdin: str | None = None) -> SandboxResult:
         """Run a command asynchronously within the sandbox."""
         # Prepare mounts
         if self.policy.mounts:
@@ -61,7 +63,7 @@ class Sandbox:
             # Cleanup any scratch mounts
             self.mount_manager.cleanup()
             
-    def run_sync(self, command: List[str], cwd: Optional[str] = None, 
-                 env: Optional[Dict[str, str]] = None, stdin: Optional[str] = None) -> SandboxResult:
+    def run_sync(self, command: list[str], cwd: str | None = None, 
+                 env: dict[str, str] | None = None, stdin: str | None = None) -> SandboxResult:
         """Run a command synchronously within the sandbox."""
         return asyncio.run(self.run(command, cwd, env, stdin))

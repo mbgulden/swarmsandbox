@@ -1,7 +1,6 @@
 import os
-import pathlib
 import tempfile
-from typing import List, Optional
+
 from .types import MountSpec, SandboxError
 
 
@@ -11,7 +10,7 @@ class MountManager:
     def __init__(self):
         self.temp_dirs = []
 
-    def prepare_mounts(self, mounts: List[MountSpec]) -> List[MountSpec]:
+    def prepare_mounts(self, mounts: list[MountSpec]) -> list[MountSpec]:
         """Normalize and validate mounts."""
         prepared = []
         for mount in mounts:

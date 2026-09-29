@@ -1,5 +1,6 @@
-from swarmsandbox.types import SandboxPolicy, ResourceLimits, NetworkPolicy, MountSpec
 from swarmsandbox.policy import PolicyValidator
+from swarmsandbox.types import MountSpec, ResourceLimits, SandboxPolicy
+
 
 def test_validate_default_policy():
     policy = PolicyValidator.default_policy()

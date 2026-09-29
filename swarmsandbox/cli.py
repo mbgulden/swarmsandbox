@@ -1,9 +1,10 @@
 import argparse
 import sys
-import json
+
+from .policy import PolicyValidator
 from .sandbox import Sandbox
 from .types import SandboxBackend
-from .policy import PolicyValidator
+
 
 def main():
     parser = argparse.ArgumentParser(description="swarmsandbox CLI")
@@ -16,10 +17,10 @@ def main():
                             default="auto", help="Sandbox backend to use")
     
     # Policy check command
-    check_parser = subparsers.add_parser("policy-check", help="Check sandbox policy")
+    subparsers.add_parser("policy-check", help="Check sandbox policy")
     
     # Inspect command
-    inspect_parser = subparsers.add_parser("inspect", help="Inspect sandbox capabilities")
+    subparsers.add_parser("inspect", help="Inspect sandbox capabilities")
     
     args = parser.parse_args()
     

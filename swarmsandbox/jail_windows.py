@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import platform
-from typing import Dict, List, Optional
-from .types import SandboxPolicy, SandboxResult
+
 from .jail_subprocess import SubprocessJail
+from .types import SandboxPolicy, SandboxResult
+
 
 class WindowsJobJail(SubprocessJail):
     """Windows-specific containment using Job Objects."""
@@ -15,7 +18,7 @@ class WindowsJobJail(SubprocessJail):
         # and assign process to a restricted job object.
         self.is_windows = platform.system() == "Windows"
         
-    async def run(self, command: List[str], cwd: Optional[str] = None, 
-                  env: Optional[Dict[str, str]] = None, stdin: Optional[str] = None) -> SandboxResult:
+    async def run(self, command: list[str], cwd: str | None = None, 
+                  env: dict[str, str] | None = None, stdin: str | None = None) -> SandboxResult:
         # Fall back to standard SubprocessJail behavior gracefully
         return await super().run(command, cwd, env, stdin)

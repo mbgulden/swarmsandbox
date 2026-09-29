@@ -1,11 +1,13 @@
+from __future__ import annotations
+
+import asyncio
 import os
-import subprocess
 import time
 import uuid
-import asyncio
-from typing import Optional, Dict, List
-from .types import SandboxPolicy, SandboxResult, SandboxBackend, SandboxTimeoutError
+from contextlib import suppress
+
 from .policy import PolicyValidator
+from .types import SandboxPolicy, SandboxResult, SandboxTimeoutError
 
 
 class SubprocessJail:
@@ -14,8 +16,8 @@ class SubprocessJail:
     def __init__(self, policy: SandboxPolicy):
         self.policy = policy
         
-    async def run(self, command: List[str], cwd: Optional[str] = None, 
-                  env: Optional[Dict[str, str]] = None, stdin: Optional[str] = None) -> SandboxResult:
+    async def run(self, command: list[str], cwd: str | None = None, 
+                  env: dict[str, str] | None = None, stdin: str | None = None) -> SandboxResult:
         sandbox_id = str(uuid.uuid4())
         start_time = time.monotonic()
         
@@ -75,16 +77,14 @@ class SubprocessJail:
             )
         except SandboxTimeoutError:
             raise
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 — intentional: convert any unexpected failure into a SandboxResult
             if process and process.returncode is None:
-                try:
+                with suppress(OSError):
                     process.kill()
-                except:
-                    pass
             return SandboxResult(
                 exit_code=-1,
                 stdout="",
-                stderr=f"Internal sandbox error: {str(e)}",
+                stderr=f"Internal sandbox error: {e!s}",
                 duration_seconds=time.monotonic() - start_time,
                 sandbox_id=sandbox_id,
                 resource_usage={}

@@ -1,21 +1,17 @@
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import List, Dict, Optional
 
 
 class SandboxError(Exception):
     """Base exception for all sandbox-related errors."""
-    pass
 
 
 class SandboxTimeoutError(SandboxError):
     """Raised when a sandbox execution exceeds the allotted time limit."""
-    pass
 
 
 class SandboxViolationError(SandboxError):
     """Raised when a sandbox execution violates a configured policy."""
-    pass
 
 
 @dataclass
@@ -26,7 +22,7 @@ class SandboxResult:
     stderr: str
     duration_seconds: float
     sandbox_id: str
-    resource_usage: Dict[str, float]
+    resource_usage: dict[str, float]
 
 
 @dataclass
@@ -50,7 +46,7 @@ class ResourceLimits:
 class NetworkPolicy:
     """Network access configuration."""
     allow_network: bool = False
-    allowed_hosts: List[str] = field(default_factory=list)
+    allowed_hosts: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -58,9 +54,9 @@ class SandboxPolicy:
     """Complete security and resource policy for the sandbox."""
     resource_limits: ResourceLimits = field(default_factory=ResourceLimits)
     network: NetworkPolicy = field(default_factory=NetworkPolicy)
-    mounts: List[MountSpec] = field(default_factory=list)
-    env_allowlist: List[str] = field(default_factory=list)
-    env_blocklist: List[str] = field(
+    mounts: list[MountSpec] = field(default_factory=list)
+    env_allowlist: list[str] = field(default_factory=list)
+    env_blocklist: list[str] = field(
         default_factory=lambda: ["API_KEY", "SECRET", "TOKEN", "PASSWORD"]
     )
 
