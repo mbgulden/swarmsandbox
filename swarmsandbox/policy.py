@@ -1,14 +1,13 @@
-import os
 from copy import deepcopy
-from typing import List
-from .types import SandboxPolicy, ResourceLimits, NetworkPolicy
+
+from .types import NetworkPolicy, ResourceLimits, SandboxPolicy
 
 
 class PolicyValidator:
     """Validates and normalizes sandbox policies."""
 
     @staticmethod
-    def validate(policy: SandboxPolicy) -> List[str]:
+    def validate(policy: SandboxPolicy) -> list[str]:
         """Validate a sandbox policy and return a list of warnings."""
         warnings = []
         if policy.resource_limits.max_memory_mb <= 0:
