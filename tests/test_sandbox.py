@@ -15,11 +15,14 @@ def test_sandbox_run_sync_echo():
 def test_sandbox_run_sync_env_scrubbing():
     sandbox = Sandbox(backend=SandboxBackend.SUBPROCESS)
     # sys.executable -c "import os; print(os.environ.get('SECRET', 'not_found'))"
-    # NOTE: include a benign var so the env is never empty — Windows refuses
-    # to spawn a process with a completely empty environment block (WinError 87).
+    # NOTE: pass a full, realistic environment (like a real caller would) —
+    # a stripped-down env breaks child startup on some platforms
+    # (e.g. WinError 87 with an empty env block, hash-seed init failures).
+    env = os.environ.copy()
+    env["SECRET"] = "my_secret_key"
     result = sandbox.run_sync(
         [sys.executable, "-c", "import os; print(os.environ.get('SECRET', 'not_found'))"],
-        env={"SECRET": "my_secret_key", "PATH": os.environ.get("PATH", "")},
+        env=env,
     )
     # The SECRET should be scrubbed by the default policy
     assert "not_found" in result.stdout
