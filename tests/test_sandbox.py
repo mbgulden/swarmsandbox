@@ -1,3 +1,4 @@
+import os
 import sys
 
 from swarmsandbox.sandbox import Sandbox
@@ -14,9 +15,11 @@ def test_sandbox_run_sync_echo():
 def test_sandbox_run_sync_env_scrubbing():
     sandbox = Sandbox(backend=SandboxBackend.SUBPROCESS)
     # sys.executable -c "import os; print(os.environ.get('SECRET', 'not_found'))"
+    # NOTE: include a benign var so the env is never empty — Windows refuses
+    # to spawn a process with a completely empty environment block (WinError 87).
     result = sandbox.run_sync(
         [sys.executable, "-c", "import os; print(os.environ.get('SECRET', 'not_found'))"],
-        env={"SECRET": "my_secret_key"}
+        env={"SECRET": "my_secret_key", "PATH": os.environ.get("PATH", "")},
     )
     # The SECRET should be scrubbed by the default policy
     assert "not_found" in result.stdout
