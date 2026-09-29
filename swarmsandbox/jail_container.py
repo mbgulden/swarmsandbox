@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import shutil
-from typing import Dict, List, Optional
-from .types import SandboxPolicy, SandboxResult
+
 from .jail_subprocess import SubprocessJail
+from .types import SandboxPolicy, SandboxResult
+
 
 class ContainerJail(SubprocessJail):
     """Container-based isolation using Docker or Podman."""
@@ -10,8 +13,8 @@ class ContainerJail(SubprocessJail):
         super().__init__(policy)
         self.container_cli = shutil.which("docker") or shutil.which("podman")
         
-    async def run(self, command: List[str], cwd: Optional[str] = None, 
-                  env: Optional[Dict[str, str]] = None, stdin: Optional[str] = None) -> SandboxResult:
+    async def run(self, command: list[str], cwd: str | None = None, 
+                  env: dict[str, str] | None = None, stdin: str | None = None) -> SandboxResult:
         
         if self.container_cli:
             # Assemble docker/podman command
