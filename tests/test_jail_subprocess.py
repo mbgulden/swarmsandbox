@@ -1,15 +1,19 @@
 import asyncio
+import sys
+
 import pytest
+
 from swarmsandbox.jail_subprocess import SubprocessJail
 from swarmsandbox.policy import PolicyValidator
-from swarmsandbox.types import ResourceLimits, SandboxTimeoutError
+from swarmsandbox.types import SandboxTimeoutError
+
 
 def test_subprocess_jail_basic():
     policy = PolicyValidator.default_policy()
     jail = SubprocessJail(policy)
     
     async def run_test():
-        return await jail.run(["python", "-c", "print('test')"])
+        return await jail.run([sys.executable, "-c", "print('test')"])
         
     result = asyncio.run(run_test())
     assert result.exit_code == 0
@@ -21,7 +25,7 @@ def test_subprocess_jail_timeout():
     jail = SubprocessJail(policy)
     
     async def run_test():
-        await jail.run(["python", "-c", "import time; time.sleep(2)"])
+        await jail.run([sys.executable, "-c", "import time; time.sleep(2)"])
         
     with pytest.raises(SandboxTimeoutError):
         asyncio.run(run_test())
@@ -34,7 +38,7 @@ def test_subprocess_jail_output_limit():
     
     async def run_test():
         script = "print('a' * 2 * 1024 * 1024)"
-        return await jail.run(["python", "-c", script])
+        return await jail.run([sys.executable, "-c", script])
         
     result = asyncio.run(run_test())
     
