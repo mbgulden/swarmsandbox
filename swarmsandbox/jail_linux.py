@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import platform
 import shutil
-from typing import Dict, List, Optional
-from .types import SandboxPolicy, SandboxResult
+
 from .jail_subprocess import SubprocessJail
+from .types import SandboxPolicy, SandboxResult
+
 
 class LinuxNamespaceJail(SubprocessJail):
     """Linux namespace isolation jail."""
@@ -12,8 +15,8 @@ class LinuxNamespaceJail(SubprocessJail):
         self.is_linux = platform.system() == "Linux"
         self.has_unshare = shutil.which("unshare") is not None
         
-    async def run(self, command: List[str], cwd: Optional[str] = None, 
-                  env: Optional[Dict[str, str]] = None, stdin: Optional[str] = None) -> SandboxResult:
+    async def run(self, command: list[str], cwd: str | None = None, 
+                  env: dict[str, str] | None = None, stdin: str | None = None) -> SandboxResult:
         
         # If we have unshare and are on linux, we could wrap the command
         if self.is_linux and self.has_unshare:
